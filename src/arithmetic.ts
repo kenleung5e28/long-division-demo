@@ -84,13 +84,15 @@ export const multiplication = (a: number, b: number): string => {
   const bn = bx.length;
   const px = (a * b).toString();
   const len = 1 + Math.max(an, bn, px.length);
-  const lines = [ax.padStart(len), 'x' + bx.padStart(len - 1)]; 
-  for (let i = 0; i < bn; i++) {
-    const p = Math.pow(10, bn - i - 1) * parseInt(bx[i]) * a;
-    if (i === bn - 1) {
-      lines.push('+' + p.toString().padStart(len - 1));
-    } else {
-      lines.push(p.toString().padStart(len));
+  const lines = [ax.padStart(len), 'x' + bx.padStart(len - 1)];
+  if (bn > 1) {
+    for (let i = 0; i < bn; i++) {
+      const p = Math.pow(10, bn - i - 1) * parseInt(bx[i]) * a;
+      if (i === bn - 1) {
+        lines.push('+' + p.toString().padStart(len - 1));
+      } else {
+        lines.push(p.toString().padStart(len));
+      }
     }
   }
   lines.push(px.padStart(len));

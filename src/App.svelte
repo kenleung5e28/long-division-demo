@@ -7,14 +7,25 @@ let divnums = [
 	[500, 49],
 	[458, 3],
 ];
+
+let mulnums = [
+	[8, 6],
+	[4, 11],
+	[23, 4],
+	[12, 23],
+	[22, 105],
+	[132, 30],
+	[225, 19],
+];
 </script>
 
 <main>
+	<h1>Long division</h1>
 	{#each divnums as [dividend, divisor]}
 	<div class="demo">
 		<div class="panel">
 			{@html processMath(`$
-				${dividend} \\times ${divisor} = ${parseInt((dividend / divisor).toString())} \\ldots ${dividend % divisor} 
+				${dividend} \\div ${divisor} = ${parseInt((dividend / divisor).toString())} \\ldots ${dividend % divisor} 
 			$`)}
 		</div>
 		<div class="panel">
@@ -22,9 +33,19 @@ let divnums = [
 		</div>
 	</div>
 	{/each}
-	<div class="panel">
-		{@html processMath('$' + multiplication(88, 209) + '$')}
+	<h1>Long multiplication</h1>
+	{#each mulnums as [a, b]}
+	<div class="demo">
+		<div class="panel">
+			{@html processMath(`$
+				${a} \\times ${b} =  ${a * b} 
+			$`)}
+		</div>
+		<div class="panel">
+			{@html processMath('$' + multiplication(a, b) + '$')}
+		</div>
 	</div>
+	{/each}
 </main>
 
 <style>
