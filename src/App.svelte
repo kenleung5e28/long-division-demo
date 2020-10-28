@@ -2,57 +2,50 @@
 import processMath from './processMath';
 import { division, multiplication } from './arithmetic';
 
-let divnums = [
-	[121, 11],
-	[500, 49],
-	[458, 3],
-];
+let type = 'div';
+let op1 = '';
+let op2 = '';
+let error = '';
+let expr = '';
 
-let mulnums = [
-	[8, 6],
-	[4, 11],
-	[23, 4],
-	[12, 23],
-	[22, 105],
-	[132, 30],
-	[225, 19],
-];
+function process() {
+	if (op1 === '' || op2 === '') {
+		return;
+	}
+	const a = parseInt(op1);
+	const b = parseInt(op2);
+	try {
+		expr = type === 'mul' ? multiplication(a, b) : division(a, b);
+		error = '';
+	} catch (err) {
+		error = err;
+		expr = '';
+	}
+}
+
+function handleOp1(e: Event) {
+	op1 = (e.target as HTMLInputElement).value;
+	process();
+}
+
+function handleOp2(e: Event) {
+	op2 = (e.target as HTMLInputElement).value;
+	process();
+}
+
+function handleTypeOption(e: Event) {
+	type = (e.target as HTMLInputElement).value;
+	op1 = '';
+	op2 = '';
+	process();
+}
 </script>
-
-<main>
-	<h1>Long division</h1>
-	{#each divnums as [dividend, divisor]}
-	<div class="demo">
-		<div class="panel">
-			{@html processMath(`$
-				${dividend} \\div ${divisor} = ${parseInt((dividend / divisor).toString())} \\ldots ${dividend % divisor} 
-			$`)}
-		</div>
-		<div class="panel">
-			{@html processMath('$' + division(dividend, divisor) + '$')}
-		</div>
-	</div>
-	{/each}
-	<h1>Long multiplication</h1>
-	{#each mulnums as [a, b]}
-	<div class="demo">
-		<div class="panel">
-			{@html processMath(`$
-				${a} \\times ${b} =  ${a * b} 
-			$`)}
-		</div>
-		<div class="panel">
-			{@html processMath('$' + multiplication(a, b) + '$')}
-		</div>
-	</div>
-	{/each}
-</main>
 
 <style>
 	main {
 		text-align: center;
+		width: 240px;
 		padding: 1em;
-		max-width: 240px;
 		margin: 0 auto;
 	}
 
@@ -62,16 +55,35 @@ let mulnums = [
 		}
 	}
 
-	.demo {
-		display: flex;
-		flex-direction: row;
-		border: 1px solid black;
-		border-radius: 5px;
-		margin: 1rem 0;
-		padding: 0.5rem;
+	.error {
+		color: red;
 	}
 
-	.demo .panel {
+	.type-options {
+		display: flex;
+	}
+
+	.type-option {
 		flex: 1 1 auto;
 	}
 </style>
+
+<main>
+	<h2>Demo</h2>
+	<form>
+		<div class="type-options"> 
+			<label class="type-option"><input type="radio" id="mul" name="type" value="mul" on:input={handleTypeOption}> Multiplication</label>
+			<label class="type-option"><input type="radio" id="div" name="type" value="div" checked on:input={handleTypeOption}> Division</label>
+		</div>
+		<label for="op1">{type === 'div' ? 'Dividend' : 'First number'}</label>
+		<br>
+		<input type="text" name="op1" on:input={handleOp1}>
+		<label for="op2">{type === 'div' ? 'Divisor' : 'Second number'}</label>
+		<br>
+		<input type="text" name="op2" on:input={handleOp2}>
+	</form>
+	<div class="error">{error}</div>
+	<div>
+		{@html processMath('$' + expr + '$')}
+	</div>
+</main>
