@@ -1,9 +1,8 @@
 <script lang="ts">
 import processMath from './processMath';
+import { division } from './arithmetic';
 
-let expr = processMath(`$
-56)\\overline{1256}
-$`);
+let expr = processMath('$' + division(816, 42) + '$');
 </script>
 
 <main>
