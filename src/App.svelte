@@ -10,6 +10,7 @@ let expr = '';
 
 function process() {
 	if (op1 === '' || op2 === '') {
+		expr = '';
 		return;
 	}
 	const a = parseInt(op1);
@@ -77,10 +78,10 @@ function handleTypeOption(e: Event) {
 		</div>
 		<label for="op1">{type === 'div' ? 'Dividend' : 'First number'}</label>
 		<br>
-		<input type="text" name="op1" on:input={handleOp1}>
+		<input type="text" name="op1" on:input={handleOp1} value={op1}>
 		<label for="op2">{type === 'div' ? 'Divisor' : 'Second number'}</label>
 		<br>
-		<input type="text" name="op2" on:input={handleOp2}>
+		<input type="text" name="op2" on:input={handleOp2} value={op2}>
 	</form>
 	<div class="error">{error}</div>
 	<div>
