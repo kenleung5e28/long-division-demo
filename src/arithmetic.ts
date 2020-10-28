@@ -28,8 +28,6 @@ export const division = (a: number, b: number): string => {
   for (let i = 1; i < qn; i++) {
     const qi = parseInt(qx[i]);
     const ai = parseInt(ax[i + bn - 1]);
-    console.log(ax);
-    console.log({ i, first: prev-prod, second: ai })
     prev = 10 * (prev - prod) + ai;
     prod = b * qi;
     sq.push(put(prev, qn - 1 - i));
@@ -38,7 +36,6 @@ export const division = (a: number, b: number): string => {
   if (rem !== 0) {
     sq.push(put(rem, 0));
   }
-  console.log(sq);
   return sq.map((row, i) => {
     const type = row[bn];
     let s = '';
@@ -74,4 +71,52 @@ export const division = (a: number, b: number): string => {
   }).join('\\\\\n');
 }
 
-export default { division };
+export const multiplication = (a: number, b: number): string => {
+  if (!Number.isInteger(a) || b < 0) {
+    throw new Error('"a" must be a non-negative integer');
+  }
+  if (!Number.isInteger(b) || b < 0) {
+    throw new Error('"b" must be a non-negative integer');
+  }
+  const ax = a.toString();
+  const an = ax.length;
+  const bx = b.toString();
+  const bn = bx.length;
+  const px = (a * b).toString();
+  const len = 1 + Math.max(an, bn, px.length);
+  const lines = [ax.padStart(len), 'x' + bx.padStart(len - 1)]; 
+  for (let i = 0; i < bn; i++) {
+    const p = Math.pow(10, bn - i - 1) * parseInt(bx[i]) * a;
+    if (i === bn - 1) {
+      lines.push('+' + p.toString().padStart(len - 1));
+    } else {
+      lines.push(p.toString().padStart(len));
+    }
+  }
+  lines.push(px.padStart(len));
+  return lines.map(row => {
+    let s = '';
+    if (row[0] === 'x') {
+      s += '\\underline{\\times';
+    } else if (row[0] === '+') {
+      s += '\\underline{\\phantom{\\times}';
+    } else {
+      s += '\\phantom{\\times}';
+    }
+    for (const c of row.substring(1)) {
+      switch (c) {
+        case ' ':
+          s += '\\phantom{0}';
+          break;
+        default:
+          s += c;
+      }
+    }
+    if (row[0] === '+' || row[0] === 'x') {
+      s += '}';
+    }
+    return s;
+  }).join('\\\\\n');
+};
+
+export default { division, multiplication };

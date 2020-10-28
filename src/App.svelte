@@ -1,28 +1,30 @@
 <script lang="ts">
 import processMath from './processMath';
-import { division } from './arithmetic';
+import { division, multiplication } from './arithmetic';
 
 let divnums = [
 	[121, 11],
 	[500, 49],
 	[458, 3],
 ];
-
-let exprs = divnums.map(([a, b]) => processMath('$' + division(a, b) + '$'));
 </script>
 
 <main>
-	{#each exprs as expr, i}
-	<div class="division-demo">
-		<div class="division-panel">
-			{@html processMath('$' + divnums[i][0] + ' \\times ' + divnums[i][1] + '$')}
+	{#each divnums as [dividend, divisor]}
+	<div class="demo">
+		<div class="panel">
+			{@html processMath(`$
+				${dividend} \\times ${divisor} = ${parseInt((dividend / divisor).toString())} \\ldots ${dividend % divisor} 
+			$`)}
 		</div>
-		<div class="division-panel">
-			{@html expr}
+		<div class="panel">
+			{@html processMath('$' + division(dividend, divisor) + '$')}
 		</div>
 	</div>
-	<hr>
 	{/each}
+	<div class="panel">
+		{@html processMath('$' + multiplication(88, 209) + '$')}
+	</div>
 </main>
 
 <style>
@@ -39,12 +41,16 @@ let exprs = divnums.map(([a, b]) => processMath('$' + division(a, b) + '$'));
 		}
 	}
 
-	.division-demo {
+	.demo {
 		display: flex;
 		flex-direction: row;
+		border: 1px solid black;
+		border-radius: 5px;
+		margin: 1rem 0;
+		padding: 0.5rem;
 	}
 
-	.division-demo .division-panel {
+	.demo .panel {
 		flex: 1 1 auto;
 	}
 </style>
