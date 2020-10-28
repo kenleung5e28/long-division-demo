@@ -27,7 +27,9 @@ export const division = (a: number, b: number): string => {
   sq.push(put(prod, qn - 1, true));
   for (let i = 1; i < qn; i++) {
     const qi = parseInt(qx[i]);
-    const ai = parseInt(ax[i]);
+    const ai = parseInt(ax[i + bn - 1]);
+    console.log(ax);
+    console.log({ i, first: prev-prod, second: ai })
     prev = 10 * (prev - prod) + ai;
     prod = b * qi;
     sq.push(put(prev, qn - 1 - i));
@@ -37,33 +39,32 @@ export const division = (a: number, b: number): string => {
     sq.push(put(rem, 0));
   }
   console.log(sq);
-  return sq.map(row => {
+  return sq.map((row, i) => {
     const type = row[bn];
-    let digitStarted = false;
-    let afterSep = false;
     let s = '';
-    for (const c of row) {
+    let digitPos = -1;
+    if (type === '(') {
+      let j = bn + 1;
+      while (sq[i - 1][j] === ' ') {
+        j += 1;
+      }
+      digitPos = j;
+    }
+    for (const [j ,c] of row.entries()) {
       switch (c) {
         case '|':
         case '(':
           s += '\\phantom{)}';
-          afterSep = true;
           break;
         case ')':
           s += ')\\overline{';
-          afterSep = true;
           break;
         case ' ':
-          s += '\\phantom{0}';
-          break;
         default:
-          if (afterSep && !digitStarted) {
-            digitStarted = true;
-            if (type === '(') {
-              s += '\\underline{';
-            }
+          if (j === digitPos && type === '(') {
+            s += '\\underline{';
           }
-          s += c;
+          s += c === ' ' ? '\\phantom{0}' : c;
       }
     }
     if (type === '(' || type === ')') {
