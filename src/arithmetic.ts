@@ -27,7 +27,7 @@ export const division = (a: number, b: number): string => {
   sq.push(put(prod, qn - 1, true));
   for (let i = 1; i < qn; i++) {
     const qi = parseInt(qx[i]);
-    const ai = parseInt(ax[i + bn - 1]);
+    const ai = parseInt(ax[an - qn + i]);
     prev = 10 * (prev - prod) + ai;
     prod = b * qi;
     sq.push(put(prev, qn - 1 - i));
