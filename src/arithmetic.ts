@@ -1,13 +1,14 @@
 export const division = (a: number, b: number): string => {
-  if (!Number.isInteger(a) || a <= 0 || a > 999) {
-    throw new Error('"a" must be an integer between 1 and 999');
+  if (!Number.isInteger(a) || a <= 0 || a > 99999) {
+    throw new Error('"a" must be an integer between 1 and 99999');
   }
-  if (!Number.isInteger(b) || b <= 0 || b > 99) {
-    throw new Error('"b" must be an integer between 1 and 99');
+  if (!Number.isInteger(b) || b <= 0 || b > 999) {
+    throw new Error('"b" must be an integer between 1 and 999');
   }
   if (a < b) {
     throw new Error('"a" must be at least as large as "b"');
   }
+  console.log({ a, b });
   const quot = parseInt((a / b).toString());
   const rem = a % b;
   const ax = a.toString();
