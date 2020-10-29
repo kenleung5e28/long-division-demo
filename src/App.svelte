@@ -13,10 +13,8 @@ function process() {
 		expr = '';
 		return;
 	}
-	const a = parseInt(op1);
-	const b = parseInt(op2);
 	try {
-		expr = type === 'mul' ? multiplication(a, b) : division(a, b);
+		expr = type === 'mul' ? multiplication(op1, op2) : division(op1, op2);
 		error = '';
 	} catch (err) {
 		error = err;
