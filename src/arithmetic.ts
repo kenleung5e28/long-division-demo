@@ -1,4 +1,6 @@
-export const division = (a: number, b: number): string => {
+export const division = (dividend: string, divisor: string): string => {
+  const a = parseInt(dividend);
+  const b = parseInt(divisor);
   if (!Number.isInteger(a) || a <= 0 || a > 99999) {
     throw new Error('"a" must be an integer between 1 and 99999');
   }
@@ -11,10 +13,8 @@ export const division = (a: number, b: number): string => {
   //console.log({ a, b });
   const quot = parseInt((a / b).toString());
   const rem = a % b;
-  const ax = a.toString();
-  const an = ax.length;
-  const bx = b.toString();
-  const bn = bx.length;
+  const an = dividend.length;
+  const bn = divisor.length;
   const qx = quot.toString();
   const qn = qx.length;
   const prefix = '|'.padStart(bn + 1);
@@ -22,14 +22,14 @@ export const division = (a: number, b: number): string => {
   const put = (num: number, space: number, underline = false) => ((underline ? prefixL: prefix) + (num.toString() + ' '.repeat(space)).padStart(an)).split('');
   let sq: string[][] = [[], []];
   sq[0] = (prefix + qx.padStart(an)).split('');
-  sq[1] = (bx + ')' + ax).split('')
+  sq[1] = (divisor + ')' + dividend).split('')
   let prod = b * parseInt(qx[0]);
-  let prev = parseInt(ax.substring(0, an - qn + 1));
+  let prev = parseInt(dividend.substring(0, an - qn + 1));
   sq.push(put(prod, qn - 1, true));
   for (let i = 1; i < qn; i++) {
     //console.log({ prev, prod });
     const qi = parseInt(qx[i]);
-    const ai = parseInt(ax[an - qn + i]);
+    const ai = parseInt(dividend[an - qn + i]);
     prev = 10 * (prev - prod) + ai;
     prod = b * qi;
     sq.push(put(prev, qn - 1 - i));
@@ -73,23 +73,23 @@ export const division = (a: number, b: number): string => {
   }).join('\\\\\n');
 }
 
-export const multiplication = (a: number, b: number): string => {
+export const multiplication = (op1: string, op2: string): string => {
+  const a = parseInt(op1);
+  const b = parseInt(op2);
   if (!Number.isInteger(a) || b < 0) {
     throw new Error('"a" must be a non-negative integer');
   }
   if (!Number.isInteger(b) || b < 0) {
     throw new Error('"b" must be a non-negative integer');
   }
-  const ax = a.toString();
-  const an = ax.length;
-  const bx = b.toString();
-  const bn = bx.length;
+  const an = op1.length;
+  const bn = op2.length;
   const px = (a * b).toString();
   const len = 1 + Math.max(an, bn, px.length);
-  const lines = [ax.padStart(len), 'x' + bx.padStart(len - 1)];
+  const lines = [op1.padStart(len), 'x' + op2.padStart(len - 1)];
   if (bn > 1) {
     for (let i = 0; i < bn; i++) {
-      const p = Math.pow(10, bn - i - 1) * parseInt(bx[i]) * a;
+      const p = Math.pow(10, bn - i - 1) * parseInt(op2[i]) * a;
       if (i === bn - 1) {
         lines.push('+' + p.toString().padStart(len - 1));
       } else {
