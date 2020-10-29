@@ -24,9 +24,10 @@ export const division = (a: number, b: number): string => {
   sq[0] = (prefix + qx.padStart(an)).split('');
   sq[1] = (bx + ')' + ax).split('')
   let prod = b * parseInt(qx[0]);
-  let prev = parseInt(ax.substr(0, prod.toString().length));
+  let prev = parseInt(ax.substring(0, an - qn + 1));
   sq.push(put(prod, qn - 1, true));
   for (let i = 1; i < qn; i++) {
+    console.log({ prev, prod });
     const qi = parseInt(qx[i]);
     const ai = parseInt(ax[an - qn + i]);
     prev = 10 * (prev - prod) + ai;
