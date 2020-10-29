@@ -151,7 +151,15 @@ export function multiplication(n1: string, n2: string): string {
   const n1DecLen = n1.split('.')[1]?.length ?? 0;
   const n2DecLen = n2.split('.')[1]?.length ?? 0;
   const px = (a * b).toString();
-  const len = 2 + Math.max(an, bn, px.length);
+  const answer = (s => {
+    if (s.length > n1DecLen + n2DecLen) {
+      const ls = s.split('');
+      ls.splice(s.length - n1DecLen - n2DecLen, 0, '.');
+      return ls.join('');
+    }
+    return '0.' + '0'.repeat(n1DecLen + n2DecLen - s.length) + s;
+  })(px);
+  const len = 2 + Math.max(an, bn, answer.length);
   const lines = [n1.padStart(len), 'x' + n2.padStart(len - 1)];
   if (bn > 1) {
     for (let i = 0; i < bn; i++) {
@@ -163,11 +171,8 @@ export function multiplication(n1: string, n2: string): string {
       }
     }
   }
-  lines.push((s => {
-    let ls = s.split('');
-    ls.splice(s.length - n1DecLen - n2DecLen, 0, '.');
-    return ls.join('');
-  })(px.padStart(len)));
+  lines.push(answer.padStart(len));
+  console.log(lines);
   return lines.map(row => {
     let s = '';
     if (row[0] === 'x') {
