@@ -151,37 +151,24 @@ export function multiplication(n1: string, n2: string): string {
   const n1DecLen = n1.split('.')[1]?.length ?? 0;
   const n2DecLen = n2.split('.')[1]?.length ?? 0;
   const px = (a * b).toString();
-  const pn = px.length;
-  const pxDecLen = n1DecLen + n2DecLen;
-  const dpPadTotal = new Set([n1DecLen, n2DecLen, pxDecLen]).size;
-  const dpPos = Array.from(new Set([n1DecLen, n2DecLen, pxDecLen]));
-  dpPos.sort();
-  const len = dpPadTotal + 1 + Math.max(an, bn, pn);
-  const lines = [];
-  for (let i = -2; i <= bn; i++) {
-    let l: string;
-    const p = Math.pow(10, bn - i - 1) * parseInt(op2[i]) * a;
-    if (i === -2) {
-      l = op1.padStart(len);
-    } else if (i === -1) {
-      l = 'x' + op2.padStart(len);
-    } else if (i === bn - 1) {
-      l = '+' + p.toString().padStart(len - 1);
-    } else if (i === bn) {
-      l = px.padStart(len);
-    } else {
-      l = p.toString().padStart(len);
-    }
-    const ls = l.split('');
-    for (const pos of dpPos) {
-      ls.splice(l.length - pos, 0, '.');
-    }
-    l = ls.join('');
-    if (i === -2 || i === -1 || i === bn || bn > 1) {
-      lines.push(l);
+  const len = 2 + Math.max(an, bn, px.length);
+  const lines = [n1.padStart(len), 'x' + n2.padStart(len - 1)];
+  if (bn > 1) {
+    for (let i = 0; i < bn; i++) {
+      const p = Math.pow(10, bn - i - 1) * parseInt(op2[i]) * a;
+      if (i === bn - 1) {
+        lines.push('+' + p.toString().padStart(len - 1));
+      } else {
+        lines.push(p.toString().padStart(len));
+      }
     }
   }
-  return lines.map((row, index) => {
+  lines.push((s => {
+    let ls = s.split('');
+    ls.splice(s.length - n1DecLen - n2DecLen, 0, '.');
+    return ls.join('');
+  })(px.padStart(len)));
+  return lines.map(row => {
     let s = '';
     if (row[0] === 'x') {
       s += '\\underline{\\times';
@@ -190,22 +177,10 @@ export function multiplication(n1: string, n2: string): string {
     } else {
       s += '\\phantom{\\times}';
     }
-    for (let i = 1; i < row.length; i++) {
-      const c = row[i];
+    for (const c of row.substring(1)) {
       switch (c) {
         case ' ':
           s += '\\phantom{0}';
-          break;
-        case '.':
-          if (row[0] === 'x') {
-            s += row.length - i === n2DecLen ? '.' : '\\phantom{.}';
-          } else if (index === 0) {
-            s += row.length - i === n1DecLen ? '.' : '\\phantom{.}';
-          } else if (index === lines.length - 1) {
-            s += row.length - i === pxDecLen ? '.' : '\\phantom{.}';
-          } else {
-            s += '\\phantom{.}';
-          }
           break;
         default:
           s += c;
