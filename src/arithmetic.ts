@@ -8,7 +8,7 @@ export const division = (a: number, b: number): string => {
   if (a < b) {
     throw new Error('"a" must be at least as large as "b"');
   }
-  console.log({ a, b });
+  //console.log({ a, b });
   const quot = parseInt((a / b).toString());
   const rem = a % b;
   const ax = a.toString();
@@ -27,7 +27,7 @@ export const division = (a: number, b: number): string => {
   let prev = parseInt(ax.substring(0, an - qn + 1));
   sq.push(put(prod, qn - 1, true));
   for (let i = 1; i < qn; i++) {
-    console.log({ prev, prod });
+    //console.log({ prev, prod });
     const qi = parseInt(qx[i]);
     const ai = parseInt(ax[an - qn + i]);
     prev = 10 * (prev - prod) + ai;
