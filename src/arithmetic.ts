@@ -93,7 +93,7 @@ export function division(dividend: string, divisor: string): string {
     let digitPos = -1;
     if (type === '(') {
       let j = separatorPos + 1;
-      while (sq[i - 1][j] === ' ' || sq[i - 1][j] === 'z' || sq[i - 1][j] === '.') {
+      while ([' ', 'z', '.'].includes(sq[i - 1][j])) {
         j += 1;
       }
       digitPos = j;
