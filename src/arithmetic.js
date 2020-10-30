@@ -152,6 +152,9 @@ export function multiplication(n1, n2) {
   const n2DecLen = n2.split('.')[1]?.length ?? 0;
   const px = (a * b).toString();
   const answer = (s => {
+    if (n1DecLen + n2DecLen === 0) {
+      return s;
+    }
     if (s.length > n1DecLen + n2DecLen) {
       const ls = s.split('');
       ls.splice(s.length - n1DecLen - n2DecLen, 0, '.');
