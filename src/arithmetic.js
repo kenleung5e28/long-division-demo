@@ -1,15 +1,15 @@
-function normalize(num: string, zeroCount: number): [number, number] {
+function normalize(num, zeroCount) {
   const dp = (num.split('.'))[1]?.length ?? 0;
   return [parseInt(num.split('.').join('') + '0'.repeat(zeroCount)), dp];
 }
 
-function insertCol(sq: string[][], symbol: string, colIndex: number): void {
+function insertCol(sq, symbol, colIndex) {
   for (let i = 0; i < sq.length; i++) {
     sq[i].splice(colIndex, 0, symbol);
   }
 }
 
-export function division(dividend: string, divisor: string): string {
+export function division(dividend, divisor) {
   if (isNaN(parseFloat(dividend))) {
     throw new Error('"dividend" must be a number');
   }
@@ -42,8 +42,8 @@ export function division(dividend: string, divisor: string): string {
   const qn = qx.length;
   const prefix = '|'.padStart(bn + 1);
   const prefixL = '('.padStart(bn + 1);
-  const put = (num: number, space: number, underline = false) => ((underline ? prefixL : prefix) + (num.toString() + ' '.repeat(space)).padStart(an)).split('');
-  let sq: string[][] = [[], []];
+  const put = (num, space, underline = false) => ((underline ? prefixL : prefix) + (num.toString() + ' '.repeat(space)).padStart(an)).split('');
+  let sq = [[], []];
   sq[0] = (prefix + qx.padStart(an)).split('');
   sq[1] = (normalizedDivisor + ')' + normalizedDividend).split('');
   let prod = b * parseInt(qx[0]);
@@ -128,7 +128,7 @@ export function division(dividend: string, divisor: string): string {
   }).join('\\\\\n');
 }
 
-export function multiplication(n1: string, n2: string): string {
+export function multiplication(n1, n2) {
   if (isNaN(parseFloat(n1))) {
     throw new Error('"n1" must be a number');
   }
@@ -172,7 +172,7 @@ export function multiplication(n1: string, n2: string): string {
     }
   }
   lines.push(answer.padStart(len));
-  console.log(lines);
+  //console.log(lines);
   return lines.map(row => {
     let s = '';
     if (row[0] === 'x') {
