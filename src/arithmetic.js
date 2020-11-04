@@ -1,3 +1,5 @@
+import { isConstructorDeclaration } from "typescript";
+
 function isNumeric(str) {
   if (typeof str != "string") return false // we only process strings!  
   return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
@@ -114,7 +116,7 @@ export function division(dividend, divisor, dp) {
   }
   const quot = parseInt((a / b).toString());
   const rem = a % b;
-  console.log({ a, b, quot, rem, exp });
+  //console.log({ a, b, quot, rem, exp });
   let lines = computeLines(a, b, quot, rem);
   //console.log(lines);
   lines = addSpaces(lines);
@@ -128,10 +130,10 @@ export function division(dividend, divisor, dp) {
       lines[i] = lines[i].padStart(lines[1].length);
     }
   }
-  console.log(lines);
+  //console.log(lines);
   let output = '';
   for (let i = 0; i < lines.length; i++) {
-    const startPos = lines[i].search(/\S/);
+    const startPos = lines[i <= 2 ? i : i - 1].search(/\S/);
     for (let j = 0; j < lines[i].length; j++) {
       const c = lines[i][j];
       if (i === 1) {
@@ -146,14 +148,14 @@ export function division(dividend, divisor, dp) {
             output += c; 
         }
       } else {
+        if (i > 0 && i % 2 === 0 && j === startPos) {
+          output += '\\underline{';
+        }
         switch (c) {
           case ' ':
             output += lines[1][j] === ' ' ? '\\phantom{.}' : '\\phantom{' + lines[1][j] + '}';
             break;
           default:
-            if (i > 0 && i % 2 === 0 && j === startPos) {
-              output += '\\underline{';
-            }
             output += c;
         }
       }
@@ -177,7 +179,7 @@ export function multiplication(n1, n2) {
   const b = parseInt(n2.split('.').join(''));
   const op1 = a.toString();
   const op2 = b.toString();
-  console.log({a, b});
+  //console.log({a, b});
   if (!Number.isInteger(a) || b < 0) {
     throw new Error('"a" must be a non-negative integer');
   }
