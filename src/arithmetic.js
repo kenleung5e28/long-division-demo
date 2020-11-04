@@ -55,7 +55,12 @@ function addSpaces(lines) {
 
 function addDot(line, dp) {
   const pos = line.length - 2 * dp;
-  return line.substring(0, pos) + '.' + line.substring(pos + 1);
+  const intPart = line.substring(0, pos);
+  const fracPart = line.substring(pos + 1);
+  if (fracPart) {
+    return intPart + '.' + fracPart;
+  }
+  return intPart;
 }
 
 function computeLines(a, b, quot, rem) {
