@@ -5,6 +5,7 @@ import { division, multiplication } from './arithmetic';
 let type = 'div';
 let op1 = '';
 let op2 = '';
+let dp = 4;
 let error = '';
 let expr = '';
 
@@ -14,7 +15,7 @@ function process() {
 		return;
 	}
 	try {
-		expr = type === 'mul' ? multiplication(op1, op2) : division(op1, op2);
+		expr = type === 'mul' ? multiplication(op1, op2) : division(op1, op2, dp);
 		error = '';
 	} catch (err) {
 		error = err;
@@ -23,12 +24,16 @@ function process() {
 }
 
 function handleOp1(e: Event) {
-	op1 = (e.target as HTMLInputElement).value;
+	let target = e.target as HTMLInputElement;
+	target.value = target.value.replace(/[^0-9.]/g, '');
+	op1 = target.value;
 	process();
 }
 
 function handleOp2(e: Event) {
-	op2 = (e.target as HTMLInputElement).value;
+	let target = e.target as HTMLInputElement;
+	target.value = target.value.replace(/[^0-9.]/g, '');
+	op2 = target.value;
 	process();
 }
 
