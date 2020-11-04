@@ -42,11 +42,20 @@ function normalizeDivNums(aInt, aFrac, bInt, bFrac) {
   a = parseInt(aNewFrac ? aNewInt + aNewFrac : aNewInt, 10);
   b *= Math.pow(10, aNewFrac.length);
   exp += aNewFrac.length;
-  return [a, b, Math.pow(10, exp)];
+  return [a, b, exp];
+}
+
+function addSpace(line) {
+  return line.split('').join(' ');
 }
 
 function addSpaces(lines) {
-  return lines.map(line => line.split('').join(' '));
+  return lines.map(line => addSpace(line));
+}
+
+function addDot(line, dp) {
+  const pos = line.length - 2 * dp;
+  return line.substring(0, pos) + '.' + line.substring(pos + 1);
 }
 
 function computeLines(a, b, quot, rem) {
@@ -94,9 +103,55 @@ export function division(dividend, divisor, dp) {
   const quot = parseInt((a / b).toString());
   const rem = a % b;
   console.log({ a, b, quot, rem, exp });
-  const lines = computeLines(a, b, quot, rem);
+  let lines = computeLines(a, b, quot, rem);
+  //console.log(lines);
+  lines = addSpaces(lines);
+  //console.log(lines);
+  lines[0] = addDot(lines[0], dp);
+  lines[1] = addDot(lines[1], exp + dp);
+  //console.log(lines);
+  lines[1] = addDot(addSpace(b.toString()), exp) + ')' + lines[1];
+  for (let i = 0; i < lines.length; i++) {
+    if (i !== 1) {
+      lines[i] = lines[i].padStart(lines[1].length);
+    }
+  }
   console.log(lines);
-  return '';
+  let output = '';
+  for (let i = 0; i < lines.length; i++) {
+    const startPos = lines[i].search(/\S/);
+    for (let j = 0; j < lines[i].length; j++) {
+      const c = lines[i][j];
+      if (i === 1) {
+        switch (c) {
+          case ' ':
+            output += '\\phantom{.}';
+            break;
+          case ')':
+            output += ')\\overline{';
+            break;
+          default:
+            output += c; 
+        }
+      } else {
+        switch (c) {
+          case ' ':
+            output += lines[1][j] === ' ' ? '\\phantom{.}' : '\\phantom{' + lines[1][j] + '}';
+            break;
+          default:
+            if (i > 0 && i % 2 === 0 && j === startPos) {
+              output += '\\underline{';
+            }
+            output += c;
+        }
+      }
+    }
+    if (i === 1 || i > 0 && i % 2 == 0) {
+      output += '}';
+    }
+    output += '\\\\\n';
+  }
+  return output;
 }
 
 export function multiplication(n1, n2) {
