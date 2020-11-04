@@ -74,7 +74,9 @@ function computeLines(a, b, quot, rem) {
     const nextDigit = parseInt(ax[ax.length - qx.length + 1 + i]);
     first = 10 * (first - second) + nextDigit;
   }
-  lines.push(rx.padStart(ax.length));
+  if (rem !== 0) {
+    lines.push(rx.padStart(ax.length));
+  }
   return lines;
 }
 
