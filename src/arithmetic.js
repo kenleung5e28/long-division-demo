@@ -55,12 +55,15 @@ function addSpaces(lines) {
 
 function addDot(line, dp) {
   const pos = line.length - 2 * dp;
-  const intPart = line.substring(0, pos);
+  let intPart = line.substring(0, pos);
+  if (!intPart) {
+    return '0.' + '0 '.repeat(-pos / 2) + line;
+  }
   const fracPart = line.substring(pos + 1);
   if (fracPart) {
     return intPart + '.' + fracPart;
   }
-  return intPart;
+  return line;
 }
 
 function computeLines(a, b, quot, rem) {
@@ -78,6 +81,8 @@ function computeLines(a, b, quot, rem) {
     lines.push((second.toString() + ' '.repeat(qx.length - 1 - i)).padStart(ax.length));
     const nextDigit = parseInt(ax[ax.length - qx.length + 1 + i]);
     first = 10 * (first - second) + nextDigit;
+    if (first === 0)
+      break;
   }
   if (rem !== 0) {
     lines.push(rx.padStart(ax.length));
