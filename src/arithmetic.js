@@ -1,131 +1,171 @@
-function normalize(num, zeroCount) {
-  const dp = (num.split('.'))[1]?.length ?? 0;
-  return [parseInt(num.split('.').join('') + '0'.repeat(zeroCount)), dp];
+import { isConstructorDeclaration } from "typescript";
+
+function isNumeric(str) {
+  if (typeof str != "string") return false // we only process strings!  
+  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
-function insertCol(sq, symbol, colIndex) {
-  for (let i = 0; i < sq.length; i++) {
-    sq[i].splice(colIndex, 0, symbol);
+function numberParts(num) {
+  let [intPart, fracPart] = (num.startsWith('.') ? '0' + num : num).split('.');
+  if (!fracPart) {
+    fracPart = '';
   }
+  intPart = intPart.replace(/^0+$/, '');
+  if (!intPart) {
+    intPart = '0';
+  }
+  fracPart = fracPart.replace(/0+$/, '');
+  return [intPart, fracPart];
 }
 
-export function division(dividend, divisor) {
-  if (isNaN(parseFloat(dividend))) {
+function normalizeDivNums(aInt, aFrac, bInt, bFrac) {
+  let a = 0;
+  let b = 0;
+  let exp = 0;
+  let aNewInt = '';
+  let aNewFrac = '';
+  if (bFrac) {
+    b = parseInt(bInt + bFrac, 10);
+    exp = bFrac.length;
+    if (bFrac.length > aFrac.length) {
+      const pad = bFrac.length - (aFrac.length ?? 0);
+      aNewInt = aInt + aFrac + '0'.repeat(pad);
+      aNewFrac = '';
+    } else {
+      aNewInt = aInt + aFrac.substr(0, bFrac.length);
+      aNewFrac = aFrac.substr(bFrac.length);
+    }
+  } else {
+    b = parseInt(bInt, 10);
+    aNewInt = aInt;
+    aNewFrac = aFrac;
+  }
+  a = parseInt(aNewFrac ? aNewInt + aNewFrac : aNewInt, 10);
+  b *= Math.pow(10, aNewFrac.length);
+  exp += aNewFrac.length;
+  return [a, b, exp];
+}
+
+function addSpace(line) {
+  return line.split('').join(' ');
+}
+
+function addSpaces(lines) {
+  return lines.map(line => addSpace(line));
+}
+
+function addDot(line, dp) {
+  const pos = line.length - 2 * dp;
+  let intPart = line.substring(0, pos);
+  if (!intPart) {
+    return '0.' + '0 '.repeat(-pos / 2) + line;
+  }
+  const fracPart = line.substring(pos + 1);
+  if (fracPart) {
+    return intPart + '.' + fracPart;
+  }
+  return line;
+}
+
+function computeLines(a, b, quot, rem) {
+  const [ax, qx, rx] = [a, quot, rem].map(n => n.toString());
+  const lines = [];
+  lines.push(qx.padStart(ax.length));
+  lines.push(ax);
+  let first = parseInt(ax.substring(0, ax.length - qx.length + 1));
+  for (let i = 0; i < qx.length; i++) {
+    const d = parseInt(qx[i]);
+    const second = d * b;
+    if (i > 0) {
+      lines.push((first.toString() + ' '.repeat(qx.length - 1 - i)).padStart(ax.length));
+    }
+    lines.push((second.toString() + ' '.repeat(qx.length - 1 - i)).padStart(ax.length));
+    const nextDigit = parseInt(ax[ax.length - qx.length + 1 + i]);
+    first = 10 * (first - second) + nextDigit;
+    if (first === 0)
+      break;
+  }
+  if (rem !== 0) {
+    lines.push(rx.padStart(ax.length));
+  }
+  return lines;
+}
+
+export function division(dividend, divisor, dp) {
+  if (!isNumeric(dividend)) {
     throw new Error('"dividend" must be a number');
   }
-  if (isNaN(parseFloat(divisor))) {
+  if (!isNumeric(divisor)) {
     throw new Error('"divisor" must be a number');
   }
-  const dividendDecPartLen = (dividend.split('.'))[1]?.length ?? 0;
-  const divisorDecPartLen = (divisor.split('.'))[1]?.length ?? 0;
-  const a0Pad = dividendDecPartLen > divisorDecPartLen ? 0 : divisorDecPartLen - dividendDecPartLen;
-  const b0Pad = divisorDecPartLen > dividendDecPartLen ? 0 : dividendDecPartLen - divisorDecPartLen;
-  const [a, aDp] = normalize(dividend, a0Pad);
-  const [b, bDp] = normalize(divisor, b0Pad);
-  const normalizedDividend = a.toString();
-  const normalizedDivisor = b.toString();
-  // console.log({ a, a0Pad, aDp, b, b0Pad, bDp });
-  if (!Number.isInteger(a) || a <= 0) {
-    throw new Error('"dividend" must be a non-negative integer');
+  if (!Number.isInteger(dp) || dp < 0) {
+    throw new Error('"dp" must be a non-negative integer');
   }
-  if (!Number.isInteger(b) || b <= 0) {
-    throw new Error('"divisor" must be a non-negative integer');
+  const [aInt, aFrac] = numberParts(dividend);
+  const [bInt, bFrac] = numberParts(divisor);
+  let [a, b, exp] = normalizeDivNums(aInt, aFrac, bInt, bFrac);
+  if (a < 0) {
+    throw new Error('"dividend" must be non-negative');
   }
-  if (a < b) {
-    throw new Error('"dividend" must be at least as large as "divisor"');
+  if (b <= 0) {
+    throw new Error('"divisor" must be positive');
+  }
+  if (dp > 0) {
+    a *= Math.pow(10, dp);
   }
   const quot = parseInt((a / b).toString());
   const rem = a % b;
-  const an = normalizedDividend.length;
-  const bn = normalizedDivisor.length;
-  const qx = quot.toString();
-  const qn = qx.length;
-  const prefix = '|'.padStart(bn + 1);
-  const prefixL = '('.padStart(bn + 1);
-  const put = (num, space, underline = false) => ((underline ? prefixL : prefix) + (num.toString() + ' '.repeat(space)).padStart(an)).split('');
-  let sq = [[], []];
-  sq[0] = (prefix + qx.padStart(an)).split('');
-  sq[1] = (normalizedDivisor + ')' + normalizedDividend).split('');
-  let prod = b * parseInt(qx[0]);
-  let prev = parseInt(normalizedDividend.substring(0, an - qn + 1));
-  sq.push(put(prod, qn - 1, true));
-  for (let i = 1; i < qn; i++) {
-    // console.log({ prev, prod });
-    const qi = parseInt(qx[i]);
-    const ai = parseInt(normalizedDividend[an - qn + i]);
-    prev = 10 * (prev - prod) + ai;
-    prod = b * qi;
-    sq.push(put(prev, qn - 1 - i));
-    sq.push(put(prod, qn - 1 - i, true));
-  }
-  if (rem !== 0) {
-    sq.push(put(rem, 0));
-  }
-  // console.log('Before');
-  // console.table(sq);
-  const bPos = bn - bDp - b0Pad;
-  if (bPos > 0) {
-    insertCol(sq, '.', bPos);
-  } else {
-    for (let i = bPos; i < 0; i++) {
-      insertCol(sq, 'z', 0);
+  //console.log({ a, b, quot, rem, exp });
+  let lines = computeLines(a, b, quot, rem);
+  //console.log(lines);
+  lines = addSpaces(lines);
+  //console.log(lines);
+  lines[0] = addDot(lines[0], dp);
+  lines[1] = addDot(lines[1], exp + dp);
+  //console.log(lines);
+  lines[1] = addDot(addSpace(b.toString()), exp) + ')' + lines[1];
+  for (let i = 0; i < lines.length; i++) {
+    if (i !== 1) {
+      lines[i] = lines[i].padStart(lines[1].length);
     }
-    insertCol(sq, '.', 0);
-    insertCol(sq, 'z', 0);
   }
-  const aPos = 1 + sq[1].indexOf(')') + an - aDp - a0Pad;
-  if (aPos > 1 + sq[1].indexOf(')')) {
-    insertCol(sq, '.', aPos);
-  } else {
-    for (let i = bPos; i < 0; i++) {
-      insertCol(sq, 'z', 0);
-    }
-    insertCol(sq, '.', 0);
-    insertCol(sq, 'z', 0);
-  }
-  // console.log('After');
-  // console.table(sq);
-  const separatorPos = sq[1].indexOf(')');
-  // console.log({ separatorPos });
-  return sq.map((row, i) => {
-    const type = row[separatorPos];
-    let s = '';
-    let digitPos = -1;
-    if (type === '(') {
-      let j = separatorPos + 1;
-      while ([' ', 'z', '.'].includes(sq[i - 1][j])) {
-        j += 1;
-      }
-      digitPos = j;
-    }
-    for (const [j, c] of row.entries()) {
-      switch (c) {
-        case '|':
-        case '(':
-          s += '\\phantom{)}';
-          break;
-        case ')':
-          s += ')\\overline{';
-          break;
-        case '.':
-          s += i === 1 ? '.' : '\\phantom{.}';
-          break;
-        case 'z':
-          s += i === 1 ? '0' : '\\phantom{0}';
-          break;
-        case ' ':
-        default:
-          if (j === digitPos && type === '(') {
-            s += '\\underline{';
-          }
-          s += c === ' ' ? '\\phantom{0}' : c;
+  //console.log(lines);
+  let output = '';
+  for (let i = 0; i < lines.length; i++) {
+    const startPos = lines[i <= 2 ? i : i - 1].search(/\S/);
+    for (let j = 0; j < lines[i].length; j++) {
+      const c = lines[i][j];
+      if (i === 1) {
+        switch (c) {
+          case ' ':
+            output += '\\phantom{.}';
+            break;
+          case ')':
+            output += ')\\overline{';
+            break;
+          default:
+            output += c; 
+        }
+      } else {
+        if (i > 0 && i % 2 === 0 && j === startPos) {
+          output += '\\underline{';
+        }
+        switch (c) {
+          case ' ':
+            output += lines[1][j] === ' ' ? '\\phantom{.}' : '\\phantom{' + lines[1][j] + '}';
+            break;
+          default:
+            output += c;
+        }
       }
     }
-    if (type === '(' || type === ')') {
-      s += '}';
+    if (i === 1 || i > 0 && i % 2 == 0) {
+      output += '}';
     }
-    return s;
-  }).join('\\\\\n');
+    output += '\\\\\n';
+  }
+  return output;
 }
 
 export function multiplication(n1, n2) {
@@ -139,7 +179,7 @@ export function multiplication(n1, n2) {
   const b = parseInt(n2.split('.').join(''));
   const op1 = a.toString();
   const op2 = b.toString();
-  console.log({a, b});
+  //console.log({a, b});
   if (!Number.isInteger(a) || b < 0) {
     throw new Error('"a" must be a non-negative integer');
   }
