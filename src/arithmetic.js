@@ -61,8 +61,16 @@ function addDot(line, dp) {
   if (!intPart) {
     return '0.' + '0 '.repeat(-pos / 2) + line;
   }
-  const fracPart = line.substring(pos + 1);
+  let fracPart = line.substring(pos + 1);
   if (fracPart) {
+    if (!intPart.trim()) {
+      intPart = intPart.substring(0, intPart.length - 1) + '0';
+    }
+    let i = 0;
+    while (fracPart[i] === ' ' && i < fracPart.length) {
+      fracPart = fracPart.substring(0, i) + '0' + fracPart.substring(i + 1);
+      i += 2;
+    }
     return intPart + '.' + fracPart;
   }
   return line;
