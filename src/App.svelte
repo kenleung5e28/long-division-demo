@@ -66,25 +66,28 @@ function handleDp(e: Event) {
 
 <style>
 	main {
-		margin: 0;
-		background-color: ghostwhite;
+		display: block;
+		padding: 1.5rem;
+		background-color: gainsboro;
 	}
 
 	.panel {
-		box-sizing: border-box;
 		background-color: white;
+		margin: 0 auto;
 		padding: 2rem;
-		margin: 1.5rem;
 		border: solid 1px gainsboro;
 		border-radius: 0.25rem;
-		max-width: 750px;
+		box-sizing: border-box;
+		max-width: 500px;
 		min-height: calc(100vh - 3rem);
+		display: flex;
+		justify-content: center;
 	}
 
 	.display-subpanel {
-		-webkit-user-select: none;  /* Chrome all / Safari all */
-  	-moz-user-select: none;     /* Firefox all */
-  	-ms-user-select: none;      /* IE 10+ */
+		-webkit-user-select: none;
+  	-moz-user-select: none;  
+  	-ms-user-select: none;
   	user-select: none;
 	}
 
@@ -97,25 +100,27 @@ function handleDp(e: Event) {
 
 <main>
 	<div class="panel">
-		<h2>{titles[type]}</h2>
-		<form>
-			<label class="type-option"><input type="radio" id="mul" name="type" value="mul" on:input={handleTypeOption}> Multiplication</label>
-			<label class="type-option"><input type="radio" id="div" name="type" value="div" checked on:input={handleTypeOption}> Division</label>
-			<label for="op1">{type === 'div' ? 'Dividend' : 'First number'}</label>
-			<br>
-			<input type="text" name="op1" on:input={handleOp1} value={op1}>
-			<label for="op2">{type === 'div' ? 'Divisor' : 'Second number'}</label>
-			<br>
-			<input type="text" name="op2" on:input={handleOp2} value={op2}>
-			{#if type === 'div'}
-				<label for="dp">Decimal places</label>
+		<div>
+			<h2>{titles[type]}</h2>
+			<form>
+				<label class="type-option"><input type="radio" id="mul" name="type" value="mul" on:input={handleTypeOption}> Multiplication</label>
+				<label class="type-option"><input type="radio" id="div" name="type" value="div" checked on:input={handleTypeOption}> Division</label>
+				<label for="op1">{type === 'div' ? 'Dividend' : 'First number'}</label>
 				<br>
-				<input type="text" name="dp" on:input={handleDp} value={dp}>
-			{/if}
-		</form>
-		<div class="error">{error}</div>
-		<div class="display-subpanel">
-			{@html processMath('$' + expr + '$')}
+				<input type="text" name="op1" on:input={handleOp1} value={op1}>
+				<label for="op2">{type === 'div' ? 'Divisor' : 'Second number'}</label>
+				<br>
+				<input type="text" name="op2" on:input={handleOp2} value={op2}>
+				{#if type === 'div'}
+					<label for="dp">Decimal places</label>
+					<br>
+					<input type="text" name="dp" on:input={handleDp} value={dp}>
+				{/if}
+			</form>
+			<div class="error">{error}</div>
+			<div class="display-subpanel">
+				{@html processMath('$' + expr + '$')}
+			</div>
 		</div>
 	</div>
 </main>
